@@ -2,6 +2,8 @@ import timeSeriesHelper as tsHelper
 import pandas as pd
 import numpy as np
 from scipy import stats as s
+import matplotlib.pyplot as plt
+
 
 #Path to the RF data
 # path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
@@ -161,15 +163,28 @@ def graphPerDayVals(filename):
 	arr = np.fromfile(filename, sep='\n')
 	print(len(arr))
 
+	t1 = arr[::3]
+	t2 = arr[1::3]
+	t3 = arr[2::3]
+
+	#x = np.arange(len(arr))
+	x = np.arange(len(t1))
+
+	print(t1)
+	#plt.scatter(x, t1, s=1, alpha=1)
+	#plt.plot(x, t1)
+	#plt.hist(t1, bins=50, color='#fcba03')
+	plt.show()
+
 #tsHelper.printFunctionality()
 
 #pandasDF = pd.DataFrame(mags, columns = ['Val'])
 
-analyzeAllTransmissions(True)
+#analyzeAllTransmissions(True)
 #parseAllTransmissions("periodogramRes.txt")
 
 #getValPerDay("./Res/periodogramResClean.txt")
-#graphPerDayVals("./Res/dayVals.dat")
+graphPerDayVals("./Res/dayVals.dat")
 
 
 # df, res = loadIQData(path, name)
