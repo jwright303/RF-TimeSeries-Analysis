@@ -1,0 +1,11 @@
+This folder contains different results from running the code.
+
+Some important files:
+
+	periodogramRes.txt 		- contains results from running the periodogram algorithm on each packet from each transmission for every device
+							its important to note that the periodogram gives us the dominant cycles of the transmissions, we are keeping the most dominant cycle
+							the entries show the dominant cycle value and the number of times it has appeared from all of the packets from that single transmission
+
+	periodogramResClean.txt - contains the same as above but with most of the text removed
+	
+	dayVals.txt 			- contains the most dominant cycle value over all packets and transmission for the day for every device over all 3 days
