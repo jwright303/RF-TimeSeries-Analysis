@@ -77,7 +77,7 @@ def getPeridogramVals(packs, winArr):
 	print("Per Values", res)
 	print("Average Per val:", rSum/float(len(packs)))
 
-def parseAllTransmissions(filename):
+def parsePeriodogramTransmissions(filename):
 	f = open(filename, "r")
 	for x in f:
 		devCheck = x[:6]
@@ -92,7 +92,7 @@ def parseAllTransmissions(filename):
 
 	f.close()
 
-def analyzeAllTransmissions(raw=False):
+def analyzePeriodogramTransmissions(raw=False):
 	for i in range(1, 51):
 		print("Device: " + str(i))
 		for j in range(3, 6):
@@ -114,7 +114,7 @@ def analyzeAllTransmissions(raw=False):
 			print("")
 		print("")
 
-def getTransmissionVal(transStr):
+def getTransmissionPeriodogramVal(transStr):
 	dictArr = transStr.split(", ")
 
 	keys = []
@@ -139,7 +139,7 @@ def getValPerDay(filename):
 
 		if len(res) == 2:
 			dictStr = (res[1].split("}"))[0]
-			key = getTransmissionVal(dictStr)
+			key = getTransmissionPeriodogramVal(dictStr)
 			cur.append(key)
 		
 		else:
@@ -159,7 +159,7 @@ def getValPerDay(filename):
 
 	return
 
-def graphPerDayVals(filename):
+def graphPeriodogramDayVals(filename):
 	arr = np.fromfile(filename, sep='\n')
 	print(len(arr))
 
@@ -181,13 +181,16 @@ def graphPerDayVals(filename):
 #pandasDF = pd.DataFrame(mags, columns = ['Val'])
 
 #analyzeAllTransmissions(True)
-#parseAllTransmissions("periodogramRes.txt")
-
+#parseAllTransmissions("./Res/periodogramRes.txt")
 #getValPerDay("./Res/periodogramResClean.txt")
-graphPerDayVals("./Res/dayVals.dat")
+#graphPerDayVals("./Res/dayVals.dat")
 
+#Path to the RF data
+path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
+name = "tx_3_iq.dat"
 
-# df, res = loadIQData(path, name)
+df, res = loadIQData(path, name)
+showAutoCorrellation(df)
 # print("Finding packets...")
 # packs, rawPacks = tsHelper.findPackets(res)
 # print("packs: ", packs)
