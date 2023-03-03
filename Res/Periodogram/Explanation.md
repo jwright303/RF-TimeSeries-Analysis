@@ -9,10 +9,10 @@
 
 ## Outcomes
 First Transmission</br>
-<img width="558" alt="histogram first transmission" src="https://user-images.githubusercontent.com/41707123/222556154-edd080c6-ad6d-4db7-a6b1-6e0cb581953a.png"><img width="551" alt="plot first transmission" src="https://user-images.githubusercontent.com/41707123/222556212-bf3da8b8-9515-44f3-9f97-1dc3a089fd34.png">
+<img width="500" alt="histogram first transmission" src="https://user-images.githubusercontent.com/41707123/222556154-edd080c6-ad6d-4db7-a6b1-6e0cb581953a.png"><img width="500" alt="plot first transmission" src="https://user-images.githubusercontent.com/41707123/222556212-bf3da8b8-9515-44f3-9f97-1dc3a089fd34.png">
 
 Second Transmission</br>
-<img width="558" alt="histogram second transmission" src="https://user-images.githubusercontent.com/41707123/222556252-7b95701f-9dad-40ee-902d-84e2fc692f2e.png"><img width="552" alt="plot second transmission" src="https://user-images.githubusercontent.com/41707123/222556275-a61cd6bd-d231-485f-a6a7-f6fe9ea12015.png">
+<img width="500" alt="histogram second transmission" src="https://user-images.githubusercontent.com/41707123/222556252-7b95701f-9dad-40ee-902d-84e2fc692f2e.png"><img width="500" alt="plot second transmission" src="https://user-images.githubusercontent.com/41707123/222556275-a61cd6bd-d231-485f-a6a7-f6fe9ea12015.png">
 
 Third Transmission</br>
-<img width="558" alt="histogram third transmission" src="https://user-images.githubusercontent.com/41707123/222556312-f936ee8c-7202-4928-9657-b738e5cb40c4.png"><img width="556" alt="plot third transmission" src="https://user-images.githubusercontent.com/41707123/222556324-1741b82b-f2c0-4eb5-8ac1-142037ec178f.png">
+<img width="500" alt="histogram third transmission" src="https://user-images.githubusercontent.com/41707123/222556312-f936ee8c-7202-4928-9657-b738e5cb40c4.png"><img width="500" alt="plot third transmission" src="https://user-images.githubusercontent.com/41707123/222556324-1741b82b-f2c0-4eb5-8ac1-142037ec178f.png">
