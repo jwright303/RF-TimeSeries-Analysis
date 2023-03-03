@@ -159,7 +159,7 @@ def getValPerDay(filename):
 
 	return
 
-def graphPeriodogramDayVals(filename):
+def graphPeriodogramDayVals(filename, hist=False, scatter=False, line=False, combinedLine=False):
 	arr = np.fromfile(filename, sep='\n')
 	print(len(arr))
 
@@ -167,14 +167,35 @@ def graphPeriodogramDayVals(filename):
 	t2 = arr[1::3]
 	t3 = arr[2::3]
 
-	#x = np.arange(len(arr))
 	x = np.arange(len(t1))
 
-	print(t1)
-	#plt.scatter(x, t1, s=1, alpha=1)
-	#plt.plot(x, t1)
-	#plt.hist(t1, bins=50, color='#fcba03')
-	plt.show()
+	#print(t1)
+	if hist == True:
+		plt.hist(t1, bins=50, color='#fcba03')
+		plt.title('Histogram of Periodogram Values for All Devices, One Transmission')
+		plt.xlabel('Periodogram Value')
+		plt.ylabel('Number of Occurances')
+		plt.show()
+	if scatter == True:
+		plt.scatter(x, t1, s=1, alpha=1)
+		plt.title('Scatter plot of Periodogram Values for All Devices, One Transmission')
+		plt.xlabel('Periodogram Value')
+		plt.ylabel('Number of Occurances')
+		plt.show()
+	if line == True:
+		plt.plot(x, t1)
+		plt.title('Line Graph of Periodogram Values for All Devices, One Transmission')
+		plt.xlabel('Periodogram Value')
+		plt.ylabel('Number of Occurances')
+		plt.show()
+	if combinedLine == True:
+		for i in range(50):
+			#print(arr[(i*3):(i*3) + 3])
+			plt.plot([1, 2, 3], arr[(i*3):(i*3) + 3])
+		plt.title('Line Graph of Periodogram Values for All Devices, All Transmissions')
+		plt.xlabel('Transmission Number')
+		plt.ylabel('Periodogram Value')
+		plt.show()
 
 #tsHelper.printFunctionality()
 
@@ -183,14 +204,16 @@ def graphPeriodogramDayVals(filename):
 #analyzeAllTransmissions(True)
 #parseAllTransmissions("./Res/periodogramRes.txt")
 #getValPerDay("./Res/periodogramResClean.txt")
-#graphPerDayVals("./Res/dayVals.dat")
+
+periodogramValsPath = "./Res/Periodogram/dayVals.dat"
+graphPeriodogramDayVals(periodogramValsPath, combinedLine=True)
 
 #Path to the RF data
 path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
 name = "tx_3_iq.dat"
 
-df, res = loadIQData(path, name)
-showAutoCorrellation(df)
+#df, res = loadIQData(path, name)
+#showAutoCorrellation(df)
 # print("Finding packets...")
 # packs, rawPacks = tsHelper.findPackets(res)
 # print("packs: ", packs)
