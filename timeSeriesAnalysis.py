@@ -41,14 +41,6 @@ def plotWindowedArray(data):
 	tsHelper.plotAllData(res)
 	tsHelper.showPlot()
 
-def loadIQData(path, name):
-	#print("Getting iq data...")
-	i, q = tsHelper.getIQData(path + name)
-	#print("Creating Mags array...")
-	df = tsHelper.createMagsArr(i, q)
-	
-	return df
-
 def analyzePacketPer(points, res):
 	#print("Packet Points:", points)
 	pack = res[(points[0]+1):(points[1])]
@@ -91,28 +83,6 @@ def parsePeriodogramTransmissions(filename):
 			print("")
 
 	f.close()
-
-def analyzePeriodogramTransmissions(raw=False):
-	for i in range(1, 51):
-		print("Device: " + str(i))
-		for j in range(3, 6):
-			print("Day: " + str(j))
-			for k in range(1, 6):
-				print("Transmission: " + str(k))
-				path = "/Volumes/Jack_SSD/Outdoor/Day_" + str(j) + "/Device_" + str(i) + "/"
-				name = "tx_" + str(k) + "_iq.dat"
-
-				df= loadIQData(path, name)
-				#print("Creating Windowed Array...")
-				res = tsHelper.createWindowedArr(df)
-				packs, rawPacks = tsHelper.findPackets(res)
-				if raw == True:
-					getPeridogramVals(rawPacks, df)
-				else:
-					getPeridogramVals(packs, res)
-				print("")
-			print("")
-		print("")
 
 def getTransmissionPeriodogramVal(transStr):
 	dictArr = transStr.split(", ")
@@ -171,19 +141,19 @@ def graphPeriodogramDayVals(filename, hist=False, scatter=False, line=False, com
 
 	#print(t1)
 	if hist == True:
-		plt.hist(t1, bins=50, color='#fcba03')
+		plt.hist(t3, bins=50, color='#fcba03')
 		plt.title('Histogram of Periodogram Values for All Devices, One Transmission')
 		plt.xlabel('Periodogram Value')
 		plt.ylabel('Number of Occurances')
 		plt.show()
 	if scatter == True:
-		plt.scatter(x, t1, s=1, alpha=1)
+		plt.scatter(x, t3, s=1, alpha=1)
 		plt.title('Scatter plot of Periodogram Values for All Devices, One Transmission')
 		plt.xlabel('Periodogram Value')
 		plt.ylabel('Number of Occurances')
 		plt.show()
 	if line == True:
-		plt.plot(x, t1)
+		plt.plot(x, t3)
 		plt.title('Line Graph of Periodogram Values for All Devices, One Transmission')
 		plt.xlabel('Periodogram Value')
 		plt.ylabel('Number of Occurances')
@@ -206,11 +176,12 @@ def graphPeriodogramDayVals(filename, hist=False, scatter=False, line=False, com
 #getValPerDay("./Res/periodogramResClean.txt")
 
 periodogramValsPath = "./Res/Periodogram/dayVals.dat"
-graphPeriodogramDayVals(periodogramValsPath, combinedLine=True)
+#graphPeriodogramDayVals(periodogramValsPath, combinedLine=True)
 
 #Path to the RF data
 path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
 name = "tx_3_iq.dat"
+tsHelper.obtainPacketsFromTransmission(raw=True)
 
 #df, res = loadIQData(path, name)
 #showAutoCorrellation(df)

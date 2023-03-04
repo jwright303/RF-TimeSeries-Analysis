@@ -164,4 +164,49 @@ def findPackets(mags):
 
 	return packs, rawPacks
 
+def savePacketInfo(rawPacks, packs):
+	print(len(packs))
+
+	with open('rawPackets.npy', 'wb') as f:
+		np.save(f, np.array(rawPacks))
+	with open('packets.npy', 'wb') as f:
+		np.save(f, np.array(packs))
+
+def obtainPacketsFromTransmission(raw=False):
+	rawDevicePackets = []
+	devicePackets = []
+
+	for n in range(1, 51):
+		print("Device: " + str(n))
+		rawDayInfo = []
+		dayInfo = []
+		for j in range(3, 6):
+			rawTransmissionInfo = []
+			transmissionInfo = []
+			print("Day: " + str(j))
+			for k in range(1, 6):
+				print("Transmission: " + str(k))
+				path = "/Volumes/Jack_SSD/Outdoor/Day_" + str(j) + "/Device_" + str(n) + "/"
+				name = "tx_" + str(k) + "_iq.dat"
+
+				i, q = getIQData(path + name)
+				#print("Creating Mags array...")
+				df = createMagsArr(i, q)
+
+				#print("Creating Windowed Array...")
+				res = createWindowedArr(df)
+
+				packs, rawPacks = findPackets(res)
+
+				rawTransmissionInfo.append(rawPacks)
+				transmissionInfo.append(packs)
+
+			rawDayInfo.append(rawTransmissionInfo)
+			dayInfo.append(transmissionInfo)
+
+		rawDevicePackets.append(rawDayInfo)
+		devicePackets.append(dayInfo)
+
+	savePacketInfo(rawDevicePackets, devicePackets)
+
 	
