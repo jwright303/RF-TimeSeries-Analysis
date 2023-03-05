@@ -168,15 +168,15 @@ def savePacketInfo(rawPacks, packs):
 	print(len(packs))
 
 	with open('rawPackets.npy', 'wb') as f:
-		np.save(f, np.array(rawPacks))
+		np.save(f, np.array(rawPacks, dtype=object))
 	with open('packets.npy', 'wb') as f:
-		np.save(f, np.array(packs))
+		np.save(f, np.array(packs, dtype=object))
 
 def obtainPacketsFromTransmission(raw=False):
 	rawDevicePackets = []
 	devicePackets = []
 
-	for n in range(1, 51):
+	for n in range(1, 2):
 		print("Device: " + str(n))
 		rawDayInfo = []
 		dayInfo = []
