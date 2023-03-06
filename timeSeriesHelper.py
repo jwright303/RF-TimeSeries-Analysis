@@ -131,7 +131,7 @@ def createWindowedArr(mags):
 # We also have a threshold for the number of signals
 #	If there are NPKT enough signals then I check to see if there is a quite time after from the reserved channel from the wifi
 # Returns an array specifying the start and end indecies of all the registered packets of both the windowed array and the raw magnitude array
-def findPackets(mags):
+def findPackets(mags, windowedMags):
 	packs = []
 	rawPacks = []
 
@@ -139,8 +139,8 @@ def findPackets(mags):
 	sigStart = 0
 	sigEnd = 0
 
-	for i in range(len(mags)):
-		cur = mags[i]
+	for i in range(len(windowedMags)):
+		cur = windowedMags[i]
 
 		if cur >= LW:
 			if sigCount == 0:
@@ -153,30 +153,29 @@ def findPackets(mags):
 
 			sigLen = sigEnd - sigStart
 			if sigLen >= NPKT:
-				resCheck = np.array(mags[i:i+22])
+				resCheck = np.array(windowedMags[i:i+22])
 				res = resCheck[resCheck[:] > 0.003]
 				
 				if len(res) < 3:
 					#print("sig start, end", sigStart, sigEnd)
-					packs.append([sigStart, sigEnd])
-					rawPacks.append([sigStart * NW, sigEnd * NW])
+					packs.append(windowedMags[sigStart+1:sigEnd])
+					rawPacks.append(mags[(sigStart * NW) + 1:sigEnd * NW])
 			sigCount = 0
 
 	return packs, rawPacks
 
-def savePacketInfo(rawPacks, packs):
-	print(len(packs))
+def savePacketInfo(rawPacks, packs, deviceNum):
+	rawPath = "PacketData/Raw/"
+	windowedPath = "PacketData/Windowed/"
 
-	with open('rawPackets.npy', 'wb') as f:
+	with open(rawPath + 'dev_' + str(deviceNum) + '_rawPackets.npy', 'wb') as f:
 		np.save(f, np.array(rawPacks, dtype=object))
-	with open('packets.npy', 'wb') as f:
+	with open(windowedPath + 'dev_' + str(deviceNum) + '_packets.npy', 'wb') as f:
 		np.save(f, np.array(packs, dtype=object))
 
 def obtainPacketsFromTransmission(raw=False):
-	rawDevicePackets = []
-	devicePackets = []
 
-	for n in range(1, 2):
+	for n in range(1, 51):
 		print("Device: " + str(n))
 		rawDayInfo = []
 		dayInfo = []
@@ -196,7 +195,7 @@ def obtainPacketsFromTransmission(raw=False):
 				#print("Creating Windowed Array...")
 				res = createWindowedArr(df)
 
-				packs, rawPacks = findPackets(res)
+				packs, rawPacks = findPackets(df, res)
 
 				rawTransmissionInfo.append(rawPacks)
 				transmissionInfo.append(packs)
@@ -204,9 +203,6 @@ def obtainPacketsFromTransmission(raw=False):
 			rawDayInfo.append(rawTransmissionInfo)
 			dayInfo.append(transmissionInfo)
 
-		rawDevicePackets.append(rawDayInfo)
-		devicePackets.append(dayInfo)
-
-	savePacketInfo(rawDevicePackets, devicePackets)
+		savePacketInfo(rawDayInfo, dayInfo, n)
 
 	
