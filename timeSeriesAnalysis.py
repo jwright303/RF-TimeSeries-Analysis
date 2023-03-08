@@ -181,7 +181,7 @@ periodogramValsPath = "./Res/Periodogram/dayVals.dat"
 #Path to the RF data
 path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
 name = "tx_3_iq.dat"
-tsHelper.obtainPacketsFromTransmission(raw=True)
+tsHelper.obtainPacketsFromTransmission(raw=False)
 
 #df, res = loadIQData(path, name)
 #showAutoCorrellation(df)
