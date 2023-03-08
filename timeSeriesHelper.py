@@ -164,6 +164,22 @@ def findPackets(mags, windowedMags):
 
 	return packs, rawPacks
 
+# Function to read all packet data from a given path
+# There is also an option to read in the packet data from the raw signals compared to the windowed signals
+# Returns an array filled with transmissions from all 50 devices as well as an optional array filled with raw signals
+def readAllPacketData(path, raw=False, rawPath=""):
+	rawDevices = []
+	windowedDevices = []
+	for i in range(1, 51):
+		windowedDevices.append(np.load(path + "dev_" + str(i) + "_packets.npy"))
+		if raw == True:
+			rawDevices.append(np.load(rawPath + "dev_" + str(i) + "_rawPackets.npy"))
+
+	return windowedDevices, rawDevices
+
+# Function to save packet info for raw and windowed signals
+# Takes in an array of windowed signal data and raw signal data for every transmission of a deivce, as well as the device number
+# Saves info to a predetermined path and returns nothing 
 def savePacketInfo(rawPacks, packs, deviceNum):
 	rawPath = "PacketData/Raw/"
 	windowedPath = "PacketData/Windowed/"
@@ -173,6 +189,9 @@ def savePacketInfo(rawPacks, packs, deviceNum):
 	with open(windowedPath + 'dev_' + str(deviceNum) + '_packets.npy', 'wb') as f:
 		np.save(f, np.array(packs, dtype=object))
 
+# Function to obtain signal data from every detected packet for every device over all 3 days
+# Takes in the option to also obtain raw signal data for the packets as well (ropughly 100 times more points per signal)
+# Returns nothing, but has the packet data saved
 def obtainPacketsFromTransmission(raw=False):
 
 	for n in range(1, 51):
