@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy import stats as s
 import matplotlib.pyplot as plt
-
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 #Path to the RF data
 # path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
@@ -167,13 +167,50 @@ def graphPeriodogramDayVals(filename, hist=False, scatter=False, line=False, com
 		plt.ylabel('Periodogram Value')
 		plt.show()
 
-#tsHelper.printFunctionality()
 
-#pandasDF = pd.DataFrame(mags, columns = ['Val'])
+def graphPacketSignals():
+	deviceNumber = 4
+	devPath = "./PacketData/Raw/dev_" + str(deviceNumber) + "_rawPackets.npy"
 
-#analyzeAllTransmissions(True)
-#parseAllTransmissions("./Res/periodogramRes.txt")
-#getValPerDay("./Res/periodogramResClean.txt")
+	packets = np.load(devPath, allow_pickle=True)
+
+	plt.title('Plot of all packets')
+	plt.xlabel('time')
+	plt.ylabel('signal magnitude')
+
+	for dayData in packets:
+		for transmission in dayData:
+			for packet in transmission:
+				# print(len(packet))
+
+				# Crop the packet since detection is done using the windowed version so there is a little extra noise when using the raw
+				croppedPac = packet[100:]
+				indx = np.arange(len(croppedPac))
+				plt.plot(indx, croppedPac)
+				plt.show()
+			break
+		break
+
+def decomposePacket(devNum):
+	devPath = "./PacketData/Raw/dev_" + str(devNum) + "_rawPackets.npy"
+	packets = np.load(devPath, allow_pickle=True)
+
+	firstDay = packets[0]
+	firstTrans = firstDay[0]
+	firstPacket = firstTrans[0]
+
+	res = seasonal_decompose(firstPacket[100:], period=2)
+	#print(res)
+
+	plt.figure(figsize=(12,8))
+	plt.subplot(411)
+	plt.plot(res.seasonal, label="seasonal", color=blue)
+	plt.subplot(412)
+	plt.plot(res.resid, label="residual", color=blue)
+	plt.show()
+
+
+decomposePacket(1)
 
 periodogramValsPath = "./Res/Periodogram/dayVals.dat"
 #graphPeriodogramDayVals(periodogramValsPath, combinedLine=True)
@@ -181,30 +218,5 @@ periodogramValsPath = "./Res/Periodogram/dayVals.dat"
 #Path to the RF data
 path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
 name = "tx_3_iq.dat"
-tsHelper.obtainPacketsFromTransmission(raw=False)
+#tsHelper.obtainPacketsFromTransmission(raw=False)
 
-#df, res = loadIQData(path, name)
-#showAutoCorrellation(df)
-# print("Finding packets...")
-# packs, rawPacks = tsHelper.findPackets(res)
-# print("packs: ", packs)
-
-# print("Plotting packet data...")
-# getPeridogramVals(packs)
-
-# print("Plotting graphs...")
-# plotAllData(df)
-# plotWindowedArray(res)
-
-# model = ARIMA(df)
-# model_fit = model.fit()
-#print(model_fit.summary())
-
-# residuals = pd.DataFrame(model_fit.resid)
-# fig, ax = plt.subplots(1,2)
-# residuals.plot(title="Residuals", ax=ax[0])
-# residuals.plot(kind='kde', title='Density', ax=ax[1])
-# plt.show()
-
-# model_fit.plot_diagnostics()
-# plt.show()

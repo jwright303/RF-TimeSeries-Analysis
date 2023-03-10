@@ -5,6 +5,7 @@ from statsmodels.tsa.arima.model import ARIMA
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 # This is a file with a lot of the helper functions for Time Series Analysis of RF data
 # To see all of the functionality the printFunctionality Function can be called
@@ -176,6 +177,15 @@ def readAllPacketData(path, raw=False, rawPath=""):
 			rawDevices.append(np.load(rawPath + "dev_" + str(i) + "_rawPackets.npy"))
 
 	return windowedDevices, rawDevices
+
+# Function to read packet data for a range of devices
+# Takes in the path of the desired packet information as well as the starting and ending device requested
+# Returns an array of packet data
+def readSelectedPacketData(path, start, end):
+	devices = []
+	for i in range(start, end+1):
+		devices.append(np.load(path + "dev_" + str(i) + "_packets.npy"))
+	return devices
 
 # Function to save packet info for raw and windowed signals
 # Takes in an array of windowed signal data and raw signal data for every transmission of a deivce, as well as the device number
