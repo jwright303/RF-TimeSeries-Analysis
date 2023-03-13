@@ -234,29 +234,3 @@ def decomposePacket(devNum, raw=True, plot=False):
 		plt.show()
 
 	return res
-
-
-decomposePacket(1)
-# data = getPacket(1, 1, 1)
-# x = np.arange(len(data))
-# plt.plot(data)
-# plt.show()
-
-
-periodogramValsPath = "./Res/Periodogram/dayVals.dat"
-#graphPeriodogramDayVals(periodogramValsPath, combinedLine=True)
-
-#Path to the RF data
-path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
-name = "tx_3_iq.dat"
-#tsHelper.obtainPacketsFromTransmission(raw=False)
-
-
-
-
-
-# 44, 319, 619, 895
-
-# 44, 331, 602, 890, 1467, 1729
-
-
