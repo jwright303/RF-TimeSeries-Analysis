@@ -216,9 +216,11 @@ def getPacket(device, day, transmission, packet=0, raw=True):
 # Function returns the resulting information (trend, seasonality, observed, and residual)
 def decomposePacket(devNum, raw=True, plot=False):
 	devPath = "./PacketData/Raw/dev_" + str(devNum) + "_rawPackets.npy"
+	p = 300
 
 	if raw == False:
 		devPath = "./PacketData/Windowed/dev_" + str(devNum) + "_packets.npy"
+		p = 3
 
 	packets = np.load(devPath, allow_pickle=True)
 
@@ -226,7 +228,7 @@ def decomposePacket(devNum, raw=True, plot=False):
 	firstTrans = firstDay[0]
 	firstPacket = firstTrans[0]
 
-	res = seasonal_decompose(firstPacket[100:], period=300)
+	res = seasonal_decompose(firstPacket[100:], period=p)
 	if plot == True:
 		res.plot()
 		plt.show()
