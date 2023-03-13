@@ -2,7 +2,7 @@ name: baseline-tests
 run-name: baseline testing
 on: [push]
 jobs:
-  hello-world:
+  baseline-testing:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -11,4 +11,4 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Test code
-        run: python -m pytest baselineTests.py
+        run: pytest baselineTests.py
