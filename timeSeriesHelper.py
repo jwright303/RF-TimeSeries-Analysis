@@ -27,7 +27,6 @@ def printFunctionality():
 	print("	*	Display all magnitude data")
 	print("	*	Windowize data")
 
-
 def calculateAutoCovariance(df):
 	autoCovar = smt.stattools.acovf(df["Val"])
 	indx = [i for i in range(len(df['Val']))]
@@ -73,16 +72,6 @@ def showAutoCorrellation(df):
 # Plots the partial autocorrelation of a time series when given the time series as a data frame
 def showPartialAutoCorrellation(df):
 	res = smt.graphics.plot_pacf(df, lags=100)
-
-# Plots the entire time series data
-def plotAllData(df):
-	dim = len(df)
-	x = [i for i in range(dim)]
-	plt.plot(x, df)
-
-# Will show whatever plots are staged to be displayed
-def showPlot():
-	plt.show()
 
 # Reads in the Iq data from a given file name / path, assumes that its I first then Q
 # Returns the I and Q data as seperate arrays

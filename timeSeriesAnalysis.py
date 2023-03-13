@@ -9,56 +9,49 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 # path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
 # name = "tx_3_iq.dat"
 
-def analyzePacket(points, res):
-	#print("Packet Points:", points)
-	pack = res[(points[0]+1):(points[1])]
-
-	tsHelper.plotAllData(pack)
-	tsHelper.showPlot()
+# Function to analyze some information about a packet. Takes in the packet magnitude values
+# Gives a basic description of the packet, shows the periodogram value and the autocorrelation
+# Returns nothing but displays valuable information
+def analyzePacket(pack, res):
+	plt.plot(pack)
+	plt.show()
 
 	pckDf = pd.DataFrame(pack, columns = ['Val'])
 	tsHelper.getStationaryStats(pckDf)
 
-	f, Pxx_den = tsHelper.getPeriodogram(pckDf)
-	perdArr = np.array(Pxx_den)
-	maxI = np.argmax(perdArr)
-	print(maxI)
+	analyzePacketPer(pack, verbose=True)
+
 	#print("max vals", Pxx_den[maxI], f[maxI])
 	tsHelper.showPeriodogram(pckDf)
 	tsHelper.showPlot()
 
-
 	tsHelper.showAutoCorrellation(pckDf)
 	tsHelper.showPlot()
 
-def plotAllData(data):
-	print("Plotting raw data...")
-	tsHelper.plotAllData(data)
-	tsHelper.showPlot()
-
-def plotWindowedArray(data):
-	print("Plotting windowed data...")
-	tsHelper.plotAllData(res)
-	tsHelper.showPlot()
-
-def analyzePacketPer(points, res):
-	#print("Packet Points:", points)
-	pack = res[(points[0]+1):(points[1])]
-
+# Function gets information about a packet periodogram value
+# The function takes in the packet and the option to be verbose
+# Returns the dominant cycle within the packet
+def analyzePacketPer(pack, verbose=False):	
 	pckDf = pd.DataFrame(pack, columns = ['Val'])
 
-	f, Pxx_den = tsHelper.getPeriodogram(pckDf)
-	perdArr = np.array(Pxx_den)
+	#f is an array of sample requencies, and pxx is the power spectral density
+	f, pxx = tsHelper.getPeriodogram(pckDf)
+	perdArr = np.array(pxx)
 	maxI = np.argmax(perdArr)
 
-	#print("max vals", f[maxI])
+	if verbose == True:
+		print("max vals", pxx[maxI], f[maxI])
+
 	return f[maxI]
 
-def getPeridogramVals(packs, winArr):
+# Function to get all dominant cycles from a list of packets
+# Function takes in list of packets, and prints out a dictionary containing the dominant cycle value and how many times it occurs
+# Function returns the dicitionary and average periodogram value
+def getPeridogramVals(packs, verbose=False):
 	rSum = 0
 	res = {}
-	for pacPs in packs:
-		v = analyzePacketPer(pacPs, winArr)
+	for pac in packs:
+		v = analyzePacketPer(pac)
 
 		key = int(v)
 		if key in res.keys():
@@ -66,9 +59,15 @@ def getPeridogramVals(packs, winArr):
 		else:
 			res[key] = 1
 		rSum += v
-	print("Per Values", res)
-	print("Average Per val:", rSum/float(len(packs)))
+	
+	if verbose == True:
+		print("Per Values", res)
+		print("Average Per val:", rSum/float(len(packs)))
 
+	return res, rSum/float(len(packs))
+
+# Function to parse periodogram values from an earlier function
+# Prints out a cleaned version of the output
 def parsePeriodogramTransmissions(filename):
 	f = open(filename, "r")
 	for x in f:
@@ -84,21 +83,25 @@ def parsePeriodogramTransmissions(filename):
 
 	f.close()
 
-def getTransmissionPeriodogramVal(transStr):
-	dictArr = transStr.split(", ")
+# # Function to parse periodogram values from an earlier function
+# # returns the periodogram value corresponding to the dominant cycle
+# def getTransmissionPeriodogramVal(transStr):
+# 	dictArr = transStr.split(", ")
 
-	keys = []
-	vals = []
+# 	keys = []
+# 	vals = []
 
-	for pair in dictArr:
-		vs = pair.split(": ")
-		keys.append(int(vs[0]))
-		vals.append(int(vs[1]))
+# 	for pair in dictArr:
+# 		vs = pair.split(": ")
+# 		keys.append(int(vs[0]))
+# 		vals.append(int(vs[1]))
 
-	ind = np.argmax(vals)
-	#print(keys[ind])
-	return keys[ind]
+# 	ind = np.argmax(vals)
+# 	#print(keys[ind])
+# 	return keys[ind]
 
+# Function to parse periodogram values from earlier function. The aim here is to get the most dominant periodogram value for a device for that day
+# Function prints out the most dominant cycle for the day and returns nothing
 def getValPerDay(filename):
 	f = open(filename, "r")
 	i = 0
@@ -125,10 +128,11 @@ def getValPerDay(filename):
 
 	finDev = (s.mode(cur)[0])
 	print(finDev[0])
-	#print("")
 
 	return
 
+# Function offers several ways to visualize periodogram values for different days
+# Returns nothing but displays different graphs
 def graphPeriodogramDayVals(filename, hist=False, scatter=False, line=False, combinedLine=False):
 	arr = np.fromfile(filename, sep='\n')
 	print(len(arr))
@@ -167,7 +171,9 @@ def graphPeriodogramDayVals(filename, hist=False, scatter=False, line=False, com
 		plt.ylabel('Periodogram Value')
 		plt.show()
 
-
+# Function to visualize individual packets
+# Added breaks, otherwise this would iterate through all packets from all transmissions over all 3 days for a single device
+# Returns nothing but displays graphs
 def graphPacketSignals():
 	deviceNumber = 4
 	devPath = "./PacketData/Raw/dev_" + str(deviceNumber) + "_rawPackets.npy"
@@ -191,26 +197,49 @@ def graphPacketSignals():
 			break
 		break
 
-def decomposePacket(devNum):
+# Function that allows one to get signal data for any packet, any device, any day, from any transmission
+# Function takes in the device, day, transmission, and optionally the packet and if it is raw (vs windowed), and returns the packet
+def getPacket(device, day, transmission, packet=0, raw=True):
+	devPath = "./PacketData/Raw/dev_" + str(device) + "_rawPackets.npy"
+	if raw == False:
+		devPath = "./PacketData/Windowed/dev_" + str(device) + "_packets.npy"
+
+	deviceInfo = np.load(devPath, allow_pickle=True)
+
+	dayData = deviceInfo[day-1]
+	transmissionData = dayData[transmission-1]
+	packet = transmissionData[packet]
+	return packet[100:]
+
+# Function to run seasonal decomposition on a packet
+# Function takes in the device to analyze, whether to analyze the raw vs windowed, and if we want to plot the information
+# Function returns the resulting information (trend, seasonality, observed, and residual)
+def decomposePacket(devNum, raw=True, plot=False):
 	devPath = "./PacketData/Raw/dev_" + str(devNum) + "_rawPackets.npy"
+
+	if raw == False:
+		devPath = "./PacketData/Windowed/dev_" + str(devNum) + "_packets.npy"
+
 	packets = np.load(devPath, allow_pickle=True)
 
 	firstDay = packets[0]
 	firstTrans = firstDay[0]
 	firstPacket = firstTrans[0]
 
-	res = seasonal_decompose(firstPacket[100:], period=2)
-	#print(res)
+	res = seasonal_decompose(firstPacket[100:], period=300)
+	if plot == True:
+		res.plot()
+		plt.show()
 
-	plt.figure(figsize=(12,8))
-	plt.subplot(411)
-	plt.plot(res.seasonal, label="seasonal", color=blue)
-	plt.subplot(412)
-	plt.plot(res.resid, label="residual", color=blue)
-	plt.show()
+	return res
 
 
 decomposePacket(1)
+# data = getPacket(1, 1, 1)
+# x = np.arange(len(data))
+# plt.plot(data)
+# plt.show()
+
 
 periodogramValsPath = "./Res/Periodogram/dayVals.dat"
 #graphPeriodogramDayVals(periodogramValsPath, combinedLine=True)
@@ -219,4 +248,13 @@ periodogramValsPath = "./Res/Periodogram/dayVals.dat"
 path = "/Volumes/Jack_SSD/Outdoor/Day_4/Device_11/"
 name = "tx_3_iq.dat"
 #tsHelper.obtainPacketsFromTransmission(raw=False)
+
+
+
+
+
+# 44, 319, 619, 895
+
+# 44, 331, 602, 890, 1467, 1729
+
 
