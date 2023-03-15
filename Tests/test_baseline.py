@@ -1,8 +1,10 @@
-import timeSeriesAnalysis as tsA
-import timeSeriesHelper as tsH
 import pytest
+import sys
+import importlib
 
-
+sys.path.append('../RF-TimeSeries-Analysis')
+tsA = importlib.import_module("timeSeriesAnalysis")
+tsH = importlib.import_module("timeSeriesHelper")
 
 #Get first device, first day, first transmission, and first packet
 def test_read_packet():
