@@ -209,7 +209,11 @@ def getPacket(device, day, transmission, packet=0, raw=True):
 	dayData = deviceInfo[day-1]
 	transmissionData = dayData[transmission-1]
 	packet = transmissionData[packet]
-	return packet[100:]
+
+	if raw == True:
+		return packet[100:]
+	else:
+		return packet
 
 # Function to run seasonal decomposition on a packet
 # Function takes in the device to analyze, whether to analyze the raw vs windowed, and if we want to plot the information
