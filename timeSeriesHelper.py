@@ -1,12 +1,17 @@
 import pandas as pd
+import numpy as np
+
 import statsmodels.tsa.api as smt
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.arima.model import ARIMA
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy import signal
-import scipy.optimize
 from statsmodels.tsa.seasonal import seasonal_decompose
+
+import matplotlib.pyplot as plt
+from matplotlib.widgets import CheckButtons
+
+import scipy.optimize
+from scipy import signal
+from scipy.optimize import leastsq
 
 # This is a file with a lot of the helper functions for Time Series Analysis of RF data
 # To see all of the functionality the printFunctionality Function can be called
@@ -224,51 +229,60 @@ def obtainPacketsFromTransmission(raw=False):
 
 		savePacketInfo(rawDayInfo, dayInfo, n)
 
-# The two functions below were obtained from stackoverflow discussion:
-# https://stackoverflow.com/questions/16716302/how-do-i-fit-a-sine-curve-to-my-data-with-pylab-and-numpy
-def fit_sin(tt, yy):
-    '''Fit sin to the input time sequence, and return fitting parameters "amp", "omega", "phase", "offset", "freq", "period" and "fitfunc"'''
-    yy = np.array(yy)
-    ff = np.fft.fftfreq(len(tt), (tt[1]-tt[0]))   # assume uniform spacing
-    Fyy = abs(np.fft.fft(yy))
-    guess_freq = abs(ff[np.argmax(Fyy[1:])+1])   # excluding the zero frequency "peak", which is related to offset
-    guess_amp = np.std(yy) * 2.**0.5
-    guess_offset = np.mean(yy)
-    guess = np.array([guess_amp, 2.*np.pi*guess_freq, 0., guess_offset])
+def plotWithCheckBoxes(t, data, fitSin):
+	fig, ax = plt.subplots()
+	l0, = ax.plot(t, data, lw=1, color='black', label='data')
+	l1, = ax.plot(t, fitSin, lw=1, color='orange', label='sin wave')
+	fig.subplots_adjust(left=0.2)
 
-    def sinfunc(t, A, w, p, c):  return A * np.sin(w*t + p) + c
-    popt, pcov = scipy.optimize.curve_fit(sinfunc, tt, yy, p0=guess)
-    A, w, p, c = popt
-    f = w/(2.*np.pi)
-    fitfunc = lambda t: A * np.sin(w*t + p) + c
-    return {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period": 1./f, "fitfunc": fitfunc, "maxcov": np.max(pcov), "rawres": (guess,popt,pcov)}
+	lines_by_label = {l.get_label(): l for l in [l0, l1]}
+	line_colors = [l.get_color() for l in lines_by_label.values()]
+	print(line_colors)
 
-def fitSinToData(data):
-	N = len(data)
-	t = np.linspace(0, 4*np.pi, N)
+	rax = fig.add_axes([0.05, 0.4, 0.1, 0.15])
+	check = CheckButtons(
+	    ax=rax,
+	    labels=['data', 'sin wave'],
+	    actives=[True, True]
+	)
 
-	guessMean = np.mean(data)
-	guessStd = 3*np.std(data)/(2**0.5)/(2**0.5)
-	guessPhase = 0
-	guessFreq = 1
-	guessAmp = 1
+	def checkCallback(label):
+	    ln = lines_by_label[label]
+	    ln.set_visible(not ln.get_visible())
+	    ln.figure.canvas.draw_idle()
+	    return
 
-	# Define the function to optimize, in this case, we want to minimize the difference
-	# between the actual data and our "guessed" parameters
-	optimizeFunc = lambda x: x[0]*np.sin(x[1]*(t+x[2])) + x[3] - data
-	estAmp, estFreq, estPhase, estMean = leastsq(optimizeFunc, [guessAmp, guessFreq, guessPhase, guessMean])[0]
-
-	# recreate the fitted curve using the optimized parameters
-	dataFit = estAmp*np.sin(estFreq*(t+estPhase)) + estMean
-
-	# recreate the fitted curve using the optimized parameters
-	fineT = np.arange(0,max(t),0.1)
-	dataFit=estAmp*np.sin(estFreq*(fineT+estPhase))+estMean
-
-	print("Sin curve stats")
-	print("period:", estFreq)
-	plt.plot(t, data, '.')
-	plt.plot(fineT, dataFit, label='after fitting')
-	plt.legend()
+	check.on_clicked(checkCallback)
 	plt.show()
-	return	
+
+	return
+
+#Fucntion to fit a sin to the data based on the charachteristics of the signals
+#Takes in the data and overlays a sin wave with option to check on or off
+def fitSin(data):
+	N = len(data)
+
+	# signals were collected over 2 seconds 25,000,000 points per second
+	timePerSignal = 1 / 25000000
+	t = np.linspace(0, timePerSignal * N, N)
+
+	# we are operating on the 2.4 Ghz band so we can grab the period by doing 1/freq
+	#period = 1 / 2412000000
+	period = 0.0000223963
+
+	minP = min(data)
+	maxP = max(data)
+
+	print("minimum point", minP)
+	print("maximum point", maxP)
+
+	d = (maxP + minP) / 2.0
+	a = maxP - d
+	c = 0
+	b = 2 * np.pi / period
+
+	dataFit = a*np.sin(b*(t+c)) + d
+	plotWithCheckBoxes(t, data, dataFit)
+
+	return
+
